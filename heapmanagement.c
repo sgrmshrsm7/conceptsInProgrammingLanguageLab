@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAXMEM 100
+#define MAXMEM 1024
+
+int fibonacciseries[] = {1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597};
 
 typedef struct Node
 {
@@ -81,16 +83,17 @@ void BestFit(Node **alloclist, Node **freelist, int mem)
                 }
                 else
                 {
-                        temp = mymalloc(mindiff, ((ptr -> offset) + mem));
+                        Node *buddy;
+                        buddy = mymalloc(mindiff, ((ptr -> offset) + mem));
                         if(prev == NULL)
-                                *freelist = temp;
+                                *freelist = buddy;
                         else
-                                prev -> next = temp;
-                        temp -> next = ptr -> next;
+                                prev -> next = buddy;
+                        buddy -> next = ptr -> next;
                         ptr -> mem -= mindiff;
                 }
                 allocinlist(ptr, alloclist);
-                printf("Memory allocated successfully\n");
+                printf("%dunits of memory allocated.\n", mem);
         }
 }
 
@@ -174,7 +177,7 @@ void traverseFreeList(Node *freelist)
 int main()
 {
         Node *alloclist = NULL, *freelist, *temp;
-        int mem = MAXMEM, offset = 0, choice, i, yesno = 1, found;
+        int mem = MAXMEM, offset = 0, choice, i, yesno = 1, found, memtoallocate;
         freelist = mymalloc(mem, offset);
         while(yesno)
         {
@@ -185,7 +188,20 @@ int main()
                 {
                         case 1: printf("Enter amount of space you want to allocate : ");
                                 scanf("%d", &mem);
-                                BestFit(&alloclist, &freelist, mem);
+                                if(mem > 0 && mem <= 987)
+                                {
+                                        i = 0;
+                                        memtoallocate = 0;
+                                        while (memtoallocate < mem)
+                                        {
+                                                memtoallocate = fibonacciseries[i];
+                                                ++i;
+                                        }
+                                        memtoallocate = fibonacciseries[i - 1];
+                                        BestFit(&alloclist, &freelist, memtoallocate);
+                                }
+                                else
+                                        printf("Invalid memory to allocate\n");
                                 break;
                         case 2: found = 0;
                                 Node *prev = NULL;
